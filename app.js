@@ -43,6 +43,7 @@ app.get('/', function(req, res){
 app.post('/movies/:movieName', function(req, res){
   var movieName = req.body.movieName;
   console.log(movieName)
+
   var getMovieList= function(movieName){
     fetchUrl('https://api-public.guidebox.com/v1.43/US/rKgyKajN9szgNZEi2JlcRUj6J2YXZ6D1/search/movie/title/' + movieName +'/fuzzy',
       function(error, meta, body){
@@ -88,13 +89,38 @@ app.post('/movies/:movieName', function(req, res){
 app.post('/movieSearch/:movieId', function(req, res){
   var movieId = req.body.movieId
   console.log(movieId)
+
   var getOneMovie = function(movieId){
     fetchUrl('https://api-public.guidebox.com/v1.43/US/rKgyKajN9szgNZEi2JlcRUj6J2YXZ6D1/movie/' + movieId,
       function(error, meta, body){
         var data = JSON.parse(body.toString())
-        console.log(data)
+        // console.log(data)
+        appendOneMovie(parseOneMovie(data))
       }
     )
+  }
+
+  var parseOneMovie = function(data){
+    var movie = {
+      'id' : data.id,
+      'title' : data.title,
+      'release_year' : data.release_year,
+      'rating' : data.rating,
+      'rottentomatoes' : data.rottentomatoes,
+      'poster' : data.poster_400x570,
+      'overview' : data.overview,
+      'purchase_web_sources' : data.purchase_web_sources
+    }
+    return movie
+  }
+
+  var appendOneMovie = function(movieData){
+    var movie = {
+      'movies' : movie
+    }
+    // console.log(movie)
+    // res.send(movies)
+    res.render('movie_info', movie)
   }
 
   getOneMovie(movieId);
