@@ -6,21 +6,23 @@
   <title>
     Stream Search
   </title>
+  <link rel="stylesheet" href="../css/foundation.css">
   <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
   <h1>Stream Search</h1>
-  <form method="POST" action="/movies">
-    Movie Name:<input name="movieName" id="movieName">
-    <button type="submit">Submit</button>
+  <form action="/movies/" id="movieForm">
+    Movie Name:<input type="text" name="movieName" id="movieName">
   </form>
   <br/>
-  <form method="GET" action="/show">
-    TV Show Name:<input name="showName" id="showName">
-    <button type="submit">Submit</button>
+
+  <form action="/shows/" id="showForm">
+    TV Show Name:<input type="text" name="showName" id="showName">
   </form>
 
-  <div>
+  <!-- <div class ="movieContainer"></div> -->
+
+<!--   <div class = 'movie'>
     {{#movies}}
       {{title}}<br/>
       {{release_year}}<br/>
@@ -29,6 +31,9 @@
       <img src="{{poster_400x570}}" alt=""><br/>
       <br/>
     {{/movies}}
-  </div>
+  </div> -->
+
+  <script src="../js/jquery.js" type="text/javascript"></script>
+  <script src="../js/script.js" type="text/javascript"></script>
 </body>
 </html>

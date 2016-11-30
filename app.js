@@ -23,11 +23,14 @@ app.use(bdPars.json()); //body parser
 const methodOverride = require('method-override');
 app.use(methodOverride('_method'));
 
-// init node-fetch
-var fetch = require('node-fetch');
+// init fetch
+const fetchUrl = require("fetch").fetchUrl;
 
 // init bcrypt.js
 const bcrypt = require('bcryptjs');
+
+
+var fuzzyMovieList = []
 
 app.listen(port, function() {
   console.log("IT'S ALIVE (on port " + port + ")")
@@ -37,61 +40,65 @@ app.get('/', function(req, res){
   res.render('index')
 })
 
-app.post('/movies', function(req, res){
+app.post('/movies/:movieName', function(req, res){
   var movieName = req.body.movieName;
-  var movieIDs = [];
-  fetch('https://api-public.guidebox.com/v1.43/US/rKgyKajN9szgNZEi2JlcRUj6J2YXZ6D1/search/movie/title/' + movieName +'/fuzzy')
-    .then(function(fetchRes){
-      return fetchRes.json()
-    })
-    .then(function(data){
-      data.results.forEach(function(movie){
-        movieIDs.push(movie.id);
-      })
-      console.log(movieIDs);
-    // res.render('index', movies);
-    })
+  console.log(movieName)
+  var getMovieList= function(movieName){
+    fetchUrl('https://api-public.guidebox.com/v1.43/US/rKgyKajN9szgNZEi2JlcRUj6J2YXZ6D1/search/movie/title/' + movieName +'/fuzzy',
+      function(error, meta, body){
+        var data = JSON.parse(body.toString());
+        var results = data.results;
+        results.forEach(function(movie){
+          return fuzzyMovieList.push(parseMovieData(movie))
+        })
+        // console.log(fuzzyMovieList)
+        appendMovieData(fuzzyMovieList)
+      }
+    )
+  }
+
+  var parseMovieData = function(data){
+    var movie = {
+      'id' : data.id,
+      'title' : data.title,
+      'release_year' : data.release_year,
+      'rating' : data.rating,
+      'rottentomatoes' : data.rottentomatoes,
+      'poster' : data.poster_400x570,
+      // 'overview' : data.overview,
+      // 'purchase_web_sources' : data.purchase_web_sources
+    }
+    return movie
+    // appendMovieData(movie);
+  }
+
+  var appendMovieData = function(fuzzyMovieList){
+    var movies = {
+      'searchQuery' : movieName,
+      'movies' : fuzzyMovieList
+    }
+    // console.log(movie)
+    res.send(movies)
+    // res.render('index', movies)
+  }
+
+  getMovieList(movieName)
+});
+
+app.post('/movieSearch/:movieId', function(req, res){
+  var movieId = req.body.movieId
+  console.log(movieId)
+  var getOneMovie = function(movieId){
+    fetchUrl('https://api-public.guidebox.com/v1.43/US/rKgyKajN9szgNZEi2JlcRUj6J2YXZ6D1/movie/' + movieId,
+      function(error, meta, body){
+        var data = JSON.parse(body.toString())
+        console.log(data)
+      }
+    )
+  }
+
+  getOneMovie(movieId);
 })
 
-var getMovie = function(id){
-  app.get('/movies', function(req, res){
-    fetch('https://api-public.guidebox.com/v1.43/US/rKgyKajN9szgNZEi2JlcRUj6J2YXZ6D1/movie/' + id)
-    .then(function(fetchRes){
-      return fetchRes.json()
-    })
-    .then(function(data){
-      var
-    })
-  })
-}
-// app.get('/show', function(req, res){
-//   getShow(req.body.showName);
-//   res.redirect('/');
-// })
-
-// var showMovie = function(data){
-//   app.get('/', function(req, res){
-//   console.log (data);
-//   res.render('index', data)
-//   })
-// }
-
-// var getMovie = function(movieName){
-//   fetch('https://api-public.guidebox.com/v1.43/US/rKgyKajN9szgNZEi2JlcRUj6J2YXZ6D1/search/movie/title/' + movieName +'/fuzzy')
-//       .then(function(res){
-//         return res.json()
-//       })
-//       .then(function(data){
-
-//       });
-// }
 
 
-// var getShow = function(){
-//   fetch('https://api-public.guidebox.com/v1.43/US/rKgyKajN9szgNZEi2JlcRUj6J2YXZ6D1/search/movie/title/' + showName +'/fuzzy')  .then(function(res){
-//         return res.json()
-//       })
-//       .then(function(data){
-//         console.log(data)
-//       });
-// }
