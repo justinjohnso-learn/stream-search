@@ -6,18 +6,35 @@
   <title>
     Stream Search
   </title>
+  <link rel="stylesheet" href="../css/foundation.css">
   <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
   <h1>Movie Info</h1>
-  <div>
+  <div class="movieContainer">
     {{#movie}}
-      {{title}}<br/>
-      {{release_year}}<br/>
-      {{rating}}<br/>
-      <a href="https://www.rottentomatoes.com/m/{{rottentomatoes}}" title="">Rotten Tomatoes</a><br/>
-      <img src="{{poster_400x570}}" alt=""><br/>
+    <div class='movie' data-movie_id="{{id}}" onclick=>
+      <div class='info'>
+        <div class='title'>{{title}}</div>
+        <div class='release_year'>{{release_year}}</div>
+        <div class='rating'>{{rating}}</div>
+        <div class='rottentomatoes'><a href="https://www.rottentomatoes.com/m/{{rottentomatoes}}" title="">Rotten Tomatoes Review</a></div>
+        <div class='overview'>{{overview}}</div>
+        <div class='flex-video widescreen trailer'><iframe src="{{trailer}}" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe></div>
+        <div class='purchase_web_sources'>
+          {{#purchase_web_sources}}
+            <a href="{{link}}" title="">{{display_name}}</a>
+            {{#formats}}
+              {{price}}
+              {{format}}
+              {{type}}
+            {{/formats}}
+          {{/purchase_web_sources}}
+        </div>
+      </div>
+      <img src="{{poster}}" alt=""><br/>
       <br/>
+    </div>
     {{/movie}}
   </div>
 </body>

@@ -29,8 +29,8 @@ const fetchUrl = require("fetch").fetchUrl;
 // init bcrypt.js
 const bcrypt = require('bcryptjs');
 
+// init session
 
-var fuzzyMovieList = []
 
 app.listen(port, function() {
   console.log("IT'S ALIVE (on port " + port + ")")
@@ -40,9 +40,18 @@ app.get('/', function(req, res){
   res.render('index')
 })
 
-app.post('/movies/:movieName', function(req, res){
-  var movieName = req.body.movieName;
-  console.log(movieName)
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------------------------------------------------
+// movie logic
+
+// -------------------------------------------------------------------
+// all movies
+
+var fuzzyMovieList = []
+
+app.get('/movies/:movieName', function(req, res){
+  var movieName = req.params.movieName;
+  // console.log(movieName)
 
   var getMovieList= function(movieName){
     fetchUrl('https://api-public.guidebox.com/v1.43/US/rKgyKajN9szgNZEi2JlcRUj6J2YXZ6D1/search/movie/title/' + movieName +'/fuzzy',
@@ -64,7 +73,6 @@ app.post('/movies/:movieName', function(req, res){
       'title' : data.title,
       'release_year' : data.release_year,
       'rating' : data.rating,
-      'rottentomatoes' : data.rottentomatoes,
       'poster' : data.poster_400x570,
       // 'overview' : data.overview,
       // 'purchase_web_sources' : data.purchase_web_sources
@@ -78,24 +86,26 @@ app.post('/movies/:movieName', function(req, res){
       'searchQuery' : movieName,
       'movies' : fuzzyMovieList
     }
-    // console.log(movie)
-    res.send(movies)
-    // res.render('index', movies)
+    console.log(movies)
+    // res.send(movies)
+    res.render('movie_list', movies)
   }
 
   getMovieList(movieName)
 });
 
-app.post('/movieSearch/:movieId', function(req, res){
-  var movieId = req.body.movieId
-  console.log(movieId)
+// -------------------------------------------------------------------
+// one movie
+
+app.get('/movieSearch/:movieId', function(req, res){
+  var movieId = req.params.movieId
+  // console.log(movieId)
 
   var getOneMovie = function(movieId){
     fetchUrl('https://api-public.guidebox.com/v1.43/US/rKgyKajN9szgNZEi2JlcRUj6J2YXZ6D1/movie/' + movieId,
       function(error, meta, body){
         var data = JSON.parse(body.toString())
-        // console.log(data)
-        appendOneMovie(parseOneMovie(data))
+        parseOneMovie(data)
       }
     )
   }
@@ -109,22 +119,127 @@ app.post('/movieSearch/:movieId', function(req, res){
       'rottentomatoes' : data.rottentomatoes,
       'poster' : data.poster_400x570,
       'overview' : data.overview,
-      'purchase_web_sources' : data.purchase_web_sources
+      'purchase_web_sources' : data.purchase_web_sources,
+      'trailer' : data.trailers.web[0].embed
     }
-    return movie
+    appendOneMovie(movie)
   }
 
   var appendOneMovie = function(movieData){
     var movie = {
-      'movies' : movie
+      'movie' : movieData
     }
     // console.log(movie)
-    // res.send(movies)
+    // res.json(movie)
     res.render('movie_info', movie)
   }
 
   getOneMovie(movieId);
 })
 
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// show logic
 
+// -------------------------------------------------------------------
+// all shows
 
+var fuzzyShowList = []
+
+app.get('/shows/:showName', function(req, res){
+  var showName = req.params.showName;
+  // console.log(showName)
+
+  var getShowList= function(showName){
+    fetchUrl('https://api-public.guidebox.com/v1.43/US/rKgyKajN9szgNZEi2JlcRUj6J2YXZ6D1/search/title/' + showName +'/fuzzy',
+      function(error, meta, body){
+        var data = JSON.parse(body.toString());
+        var results = data.results;
+        results.forEach(function(show){
+          fuzzyShowList.push(parseShowData(show))
+        })
+        // console.log(fuzzyShowList)
+        appendShowData(fuzzyShowList)
+      }
+    )
+  }
+
+  var parseShowData = function(data){
+    console.log(data)
+    var show = {
+      'id' : data.id,
+      'title' : data.title,
+      'first_aired' : data.first_aired,
+      'artwork' : data.artwork_608x342,
+    }
+    return show
+    // appendShowData(show);
+  }
+
+  var appendShowData = function(fuzzyShowList){
+    var shows = {
+      'searchQuery' : showName,
+      'shows' : fuzzyShowList
+    }
+    // console.log(shows)
+    // res.send(shows)
+    res.render('show_list', shows)
+  }
+
+  getShowList(showName)
+});
+
+// -------------------------------------------------------------------
+// one show
+
+app.get('/showSearch/:showId', function(req, res){
+  var showId = req.params.showId
+  // console.log(showId)
+
+  var getOneShow = function(showId){
+    fetchUrl('https://api-public.guidebox.com/v1.43/US/rKgyKajN9szgNZEi2JlcRUj6J2YXZ6D1/show/' + showId,
+      function(error, meta, body){
+        var data = JSON.parse(body.toString())
+        parseOneShow(data)
+      }
+    )
+  }
+
+  var getAllEpisodes = function(showId){
+    fetchUrl('https://api-public.guidebox.com/v1.43/US/rKgyKajN9szgNZEi2JlcRUj6J2YXZ6D1/show/' + showId + '/episodes/all/0/100/all/all/true',
+      function(error, meta, body){
+        var data = JSON.parse(body.toString())
+        console.log(data)
+        // parseOneShow(data)
+      }
+    )
+  }
+
+  var getOneEpisode = function(episodeId){
+
+  }
+
+  var parseOneShow = function(data){
+    getAllEpisodes(showId);
+    var show = {
+      'id' : data.id,
+      'title' : data.title,
+      'first_aired' : data.first_aired,
+      'network' : data.network,
+      'rating' : data.rating,
+      'artwork' : data.artwork_608x342,
+      'overview' : data.overview,
+    }
+    appendOneShow(show)
+  }
+
+  var appendOneShow = function(showData){
+    var show = {
+      'show' : showData
+    }
+    // console.log(show)
+    // res.json(show)
+    res.render('show_info', show)
+  }
+
+  getOneShow(showId);
+})

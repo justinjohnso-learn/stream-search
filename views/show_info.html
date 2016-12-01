@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>
+    Stream Search
+  </title>
+  <link rel="stylesheet" href="../css/foundation.css">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <h1>Show Info</h1>
+  <div class="showContainer">
+    {{#show}}
+    <div class='show' data-show_id="{{id}}" onclick=>
+      <div class='info'>
+        <div class='title'>{{title}}</div>
+        <div class='first_aired'>{{first_aired}}</div>
+        <div class='rating'>{{rating}}</div>
+        <div class='overview'>{{overview}}</div>
+        <div class='purchase_web_sources'>
+      </div>
+      <img src="{{artwork}}" alt=""><br/>
+      <br/>
+    </div>
+    {{/show}}
+  </div>
+</body>
+</html>
