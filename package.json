@@ -20,6 +20,7 @@
     "bcryptjs": "^2.3.0",
     "body-parser": "^1.15.2",
     "express": "^4.14.0",
+    "express-session": "^1.14.2",
     "fetch": "^1.1.0",
     "method-override": "^2.3.7",
     "mustache": "^2.3.0",

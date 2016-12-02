@@ -28,34 +28,147 @@ const fetchUrl = require("fetch").fetchUrl;
 
 // init bcrypt.js
 const bcrypt = require('bcryptjs');
+var salt = bcrypt.genSaltSync(10);
+var hash = bcrypt.hashSync("B4c0/\/", salt);
 
 // init session
+const session = require('express-session');
+app.use(session({
+  secret: 'theTruthIsOutThere51',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false }
+}))
 
+// -------------------------------------------------------------------
+// set up page
 
 app.listen(port, function() {
   console.log("IT'S ALIVE (on port " + port + ")")
 });
 
 app.get('/', function(req, res){
-  res.render('index')
+  var logged_in, first_name;
+  if(req.session.user){
+    logged_in = true;
+    first_name = req.session.user.first_name;
+  }
+  var loginStatus = {
+    'first_name': first_name,
+    'logged_in': logged_in
+  };
+  console.log(loginStatus)
+  res.render('index', loginStatus)
 })
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+// -----------------------------------------------------------------------------------------------------------------------------------------
+// signup logic
+
+app.get('/signup', function(req, res){
+  var logged_in, user_id, first_name;
+  if(req.session.user){
+    logged_in = true;
+    user_id = req.session.user.id;
+    first_name = req.session.user.first_name;
+  }
+  var loginStatus = {
+    'user_id' : user_id,
+    'first_name': first_name,
+    'logged_in': logged_in
+  };
+  console.log(loginStatus)
+  res.render('signup')
+});
+
+app.post('/signup', function(req, res){
+  var data = req.body;
+
+  bcrypt.hash(data.password, 10, function(err, hash){
+    db.none(
+      'INSERT INTO users (first_name, last_name, email, password_digest) VALUES ($1, $2, $3, $4)', [data.first_name, data.last_name, data.email, hash]
+      )
+      .catch(function(user){
+        res.send('Error. User could not be created.');
+      })
+      .then(function(){
+        res.send("User Created!")
+      })
+      // .then(function(){
+      //   setTimeout(function(){
+      //     res.redirect('/');
+      //   }, 1000)
+      // });
+  });
+  console.log(data);
+});
+
+// -----------------------------------------------------------------------------------------------------------------------------------------
+// login logic
+
+app.get('/login', function(req, res){
+  var logged_in, email;
+  if(req.session.user){
+    logged_in = true;
+    email = req.session.user.email;
+  }
+  var loginStatus = {
+    'logged_in': logged_in,
+    'email': email
+  };
+  console.log(loginStatus)
+  res.render('login', loginStatus)
+})
+
+app.post('/login', function(req, res){
+  var data = req.body;
+
+  db.one(
+    "SELECT * FROM users WHERE email = $1",
+    [data.email]
+  ).catch(function(){
+    res.send('Email/Password not found.')
+  }).then(function(user){
+    bcrypt.compare(data.password, user.password_digest, function(err, cmp){
+      if(cmp){
+        req.session.user = user;
+        res.redirect('/');
+      } else {
+        res.send('Email/Password not found.')
+      }
+    });
+  });
+});
+
 // -----------------------------------------------------------------------------------------------------------------------------------------
 // movie logic
 
 // -------------------------------------------------------------------
 // all movies
 
-var fuzzyMovieList = []
 
 app.get('/movies/:movieName', function(req, res){
+  console.log(req.params.movieName)
+  var logged_in, user_id, first_name;
+  if(req.session.user){
+    logged_in = true;
+    user_id = req.session.user.id;
+    first_name = req.session.user.first_name;
+  }
+  var loginStatus = {
+    'user_id' : user_id,
+    'first_name': first_name,
+    'logged_in': logged_in
+  };
+
   var movieName = req.params.movieName;
   // console.log(movieName)
 
   var getMovieList= function(movieName){
     fetchUrl('https://api-public.guidebox.com/v1.43/US/rKgyKajN9szgNZEi2JlcRUj6J2YXZ6D1/search/movie/title/' + movieName +'/fuzzy',
       function(error, meta, body){
+        var fuzzyMovieList = []
         var data = JSON.parse(body.toString());
         var results = data.results;
         results.forEach(function(movie){
@@ -86,9 +199,13 @@ app.get('/movies/:movieName', function(req, res){
       'searchQuery' : movieName,
       'movies' : fuzzyMovieList
     }
-    console.log(movies)
-    // res.send(movies)
-    res.render('movie_list', movies)
+
+    var data = {
+      'loginStatus' : loginStatus,
+      'movies' : movies
+    }
+    console.log(data.loginStatus)
+    res.render('movie_list', data)
   }
 
   getMovieList(movieName)
@@ -97,7 +214,20 @@ app.get('/movies/:movieName', function(req, res){
 // -------------------------------------------------------------------
 // one movie
 
-app.get('/movieSearch/:movieId', function(req, res){
+app.get('/movie_search/:movieId', function(req, res){
+
+  var logged_in, user_id, first_name;
+  if(req.session.user){
+    logged_in = true;
+    user_id = req.session.user.id;
+    first_name = req.session.user.first_name;
+  }
+  var loginStatus = {
+    'user_id' : user_id,
+    'first_name': first_name,
+    'logged_in': logged_in
+  };
+
   var movieId = req.params.movieId
   // console.log(movieId)
 
@@ -111,6 +241,13 @@ app.get('/movieSearch/:movieId', function(req, res){
   }
 
   var parseOneMovie = function(data){
+    // var trailer;
+    // if (typeof data.trailers.web[0] == undefined){
+    //   trailer = 'No Trailer Available'
+    // }
+    // else if (typeof data.trailers.web[0] != undefined) {
+    //   trailer = data.trailers.web[0].embed;
+    // }
     var movie = {
       'id' : data.id,
       'title' : data.title,
@@ -119,8 +256,9 @@ app.get('/movieSearch/:movieId', function(req, res){
       'rottentomatoes' : data.rottentomatoes,
       'poster' : data.poster_400x570,
       'overview' : data.overview,
-      'purchase_web_sources' : data.purchase_web_sources,
-      'trailer' : data.trailers.web[0].embed
+      'subscription_web_sources' : data.subscription_web_sources,
+      'purchase_web_sources' : data.purchase_web_sources
+      // 'trailer' : trailer
     }
     appendOneMovie(movie)
   }
@@ -129,9 +267,14 @@ app.get('/movieSearch/:movieId', function(req, res){
     var movie = {
       'movie' : movieData
     }
-    // console.log(movie)
-    // res.json(movie)
-    res.render('movie_info', movie)
+
+    var data = {
+      'loginStatus' : loginStatus,
+      'movie' : movie
+    }
+
+    console.log(data.loginStatus)
+    res.render('movie_info', data)
   }
 
   getOneMovie(movieId);
@@ -143,15 +286,29 @@ app.get('/movieSearch/:movieId', function(req, res){
 // -------------------------------------------------------------------
 // all shows
 
-var fuzzyShowList = []
 
 app.get('/shows/:showName', function(req, res){
+
+  var logged_in, user_id, first_name;
+  if(req.session.user){
+    logged_in = true;
+    user_id = req.session.user.id;
+    first_name = req.session.user.first_name;
+  }
+  var loginStatus = {
+    'user_id' : user_id,
+    'first_name': first_name,
+    'logged_in': logged_in
+  };
+  console.log(loginStatus)
+
   var showName = req.params.showName;
   // console.log(showName)
 
   var getShowList= function(showName){
     fetchUrl('https://api-public.guidebox.com/v1.43/US/rKgyKajN9szgNZEi2JlcRUj6J2YXZ6D1/search/title/' + showName +'/fuzzy',
       function(error, meta, body){
+        var fuzzyShowList = []
         var data = JSON.parse(body.toString());
         var results = data.results;
         results.forEach(function(show){
@@ -191,7 +348,21 @@ app.get('/shows/:showName', function(req, res){
 // -------------------------------------------------------------------
 // one show
 
-app.get('/showSearch/:showId', function(req, res){
+app.get('/show_search/:showId', function(req, res){
+
+  var logged_in, user_id, first_name;
+  if(req.session.user){
+    logged_in = true;
+    user_id = req.session.user.id;
+    first_name = req.session.user.first_name;
+  }
+  var loginStatus = {
+    'user_id' : user_id,
+    'first_name': first_name,
+    'logged_in': logged_in
+  };
+  console.log(loginStatus)
+
   var showId = req.params.showId
   // console.log(showId)
 
@@ -242,4 +413,53 @@ app.get('/showSearch/:showId', function(req, res){
   }
 
   getOneShow(showId);
+})
+
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// media_queue logic
+
+app.get('/media_queue', function(req, res){
+
+  var logged_in, user_id, first_name;
+  if(req.session.user){
+    logged_in = true;
+    user_id = req.session.user.id;
+    first_name = req.session.user.first_name;
+  }
+  var loginStatus = {
+    'user_id' : user_id,
+    'first_name': first_name,
+    'logged_in': logged_in
+  };
+
+  db.many('SELECT * FROM media_queue WHERE user_id = $1', [user_id])
+    .then(function(queue){
+      var data = {
+        'loginStatus' : loginStatus,
+        'queue' : queue
+      }
+      res.render('media_queue', data)
+      console.log(data);
+    })
+})
+
+app.post('/media_queue', function(req, res){
+  var data = req.body
+  // console.log(req.body)
+
+  db.none('INSERT INTO media_queue (title, media_type, media_id, user_id) VALUES ($1, $2, $3, $4)', [data.title, data.media_type, data.media_id, data.user_id]);
+
+  var logged_in, user_id, first_name;
+  if(req.session.user){
+    logged_in = true;
+    user_id = req.session.user.id;
+    first_name = req.session.user.first_name;
+  }
+  var loginStatus = {
+    'user_id' : user_id,
+    'first_name': first_name,
+    'logged_in': logged_in
+  };
+  // console.log(loginStatus)
+  res.render('media_queue', loginStatus)
 })

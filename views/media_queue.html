@@ -13,17 +13,6 @@
   <nav>
     <ul>
       <li class="navHome"><a href="/" title="Home">Home</a></li>
-      {{#loginStatus.logged_in}}
-        <li><a href="/media_queue" title="">View Queue</a></li>
-
-      {{/loginStatus.logged_in}}
-      {{^loginStatus.logged_in}}
-        <div class='navLogin'>
-          <li><a href="/login/" title="">Login</a></li>
-          <li><span>|</span></li>
-          <li><a href="/signup/" title="">Signup</a></li>
-        </div>
-      {{/loginStatus.logged_in}}
       <li><form class="navform" action="/movies/" id="movieForm"><input type="text" name="movieName" id="movieName" placeholder="Movie">
       </form></li>
       <li><form class="navform" action="/shows/" id="showForm"><input type="text" name="showName" id="showName" placeholder="TV Show">
@@ -31,22 +20,17 @@
     </ul>
   </nav>
   <div class='spacer'></div>
-  <div class="movieContainer">
-    <div class="row">
-      {{#movies.movies}}
-      <div class='movie large-3 medium-4 columns' data-movie_id="{{id}}">
-        <div class='info'>
-          <span class='title'>{{title}}</span>
-          <span class='release_year'>{{release_year}}</span>
-          <span class='rating'>{{rating}}</span>
-        </div>
-        <img src="{{poster}}" alt=""><br/>
-        <br/>
+  <h1>Media Queue</h1>
+    Test
+  <div class="queue">
+    {{#queue}}
+      <div data-queue_id='{{id}}'>
+        <span>Title: {{title}}</span><br/>
+        <span>Type: {{media_type}}</span><br/>
+        <button class="button removeButton" data-user_id="{{loginStatus.user_id}}">Remove From Queue</button>
       </div>
-      {{/movies.movies}}
-    </div>
+    {{/queue}}
   </div>
-
   <script src="../js/jquery.js" type="text/javascript"></script>
   <script src="../js/script.js" type="text/javascript"></script>
 </body>

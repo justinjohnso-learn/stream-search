@@ -4,26 +4,28 @@ console.log('JS working!')
 // movie logic
 
 function getMovieData(movieName){
-  $.get('/movies/' + movieName, {movieName}, function(data) {
-    console.log(data)
+  $.get('/movies/' + movieName, function(data) {
+    // console.log(data)
     // appendMovieList(data)
-    // window.location.assign('/movies/' + movieName)
+    window.location.assign('/movies/' + movieName)
   });
 }
 
 var getOneMovie = function(movieId, movieTitle){
   // console.log('id', movieId);
-  return $.get('/movieSearch/' + movieId, function(data) {
+  return $.get('/movie_search/' + movieId, function(data) {
     // console.log(data.movie.trailer.web[0].link)
-    window.location.assign('/movieSearch/' + movieId)
+    window.location.assign('/movie_search/' + movieId)
   });
 }
 
 var movieSearchListener = function(){
+  // console.log('listeners')
   $('#movieForm').submit(function(event) {
     // $('.movieContainer').empty();
     // $('.movieContainer').remove();
     var movieName = $('#movieForm input').val()
+    console.log(movieName)
     getMovieData(movieName);
     event.preventDefault();
   });
@@ -52,9 +54,8 @@ function getShowData(showName){
 
 var getOneShow = function(showId, showTitle){
   // console.log('id', showId);
-  return $.get('/showSearch/' + showId, function(data) {
-    // console.log(data.show.trailer.web[0].link)
-    window.location.assign('/showSearch/' + showId)
+  return $.get('/show_search/' + showId, function(data) {
+    window.location.assign('/show_search/' + showId)
   });
 }
 
@@ -77,6 +78,49 @@ var showClickListener = function(){
   })
 }
 showClickListener()
+
+// -------------------------------------------------------------------------------------------------------------------------------------------
+// media_queue logic
+
+var postToQueue = function(data){
+  return $.post('/media_queue/', data, function(data){
+    $('.queueButton').text('Added!')
+                     .removeClass('queueButton')
+                     .css('backgroundColor', 'green');
+  });
+}
+
+var addToQueueListener = function(){
+  $('.queueButton').on('click', function(event){
+    var movie = $(this).parent().parent().parent().siblings('.movieContainer').find('.movie');
+    var nav = $(this).parent();
+    var data = {
+      'title' : movie[0].dataset.movie_title,
+      'media_id' : movie[0].dataset.movie_id,
+      'media_type' : movie[0].dataset.media_type,
+      'user_id' : this.dataset.user_id
+    }
+    console.log(data)
+    postToQueue(data)
+  })
+}
+addToQueueListener()
+
+var removeFromQueueListener = function(){
+  $('.queueButton').on('click', function(event){
+    var movie = $(this).parent().parent().parent().siblings('.movieContainer').find('.movie');
+    var nav = $(this).parent();
+    var data = {
+      'title' : movie[0].dataset.movie_title,
+      'media_id' : movie[0].dataset.movie_id,
+      'media_type' : movie[0].dataset.media_type,
+      'user_id' : this.dataset.user_id
+    }
+    console.log(data)
+    postToQueue(data)
+  })
+}
+removeFromQueueListener()
 
 // var appendMovieList = function(movieList){
 //   var $title, $release_year, $rating, $rottentomatoes, $poster;
