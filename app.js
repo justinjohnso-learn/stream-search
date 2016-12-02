@@ -41,7 +41,7 @@ app.use(session({
 }))
 
 // local variables
-var GUIDEBOX_KEY = process.env.GUIDEBOX_API_KEY;
+var GUIDEBOX_KEY = process.env.GUIDEBOX_KEY;
 
 // -------------------------------------------------------------------
 // set up page
