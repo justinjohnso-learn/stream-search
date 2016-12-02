@@ -8,23 +8,33 @@
   <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
-<nav>
-  <ul>
-    <li class="navHome"><a href="/" title="Home">Home</a></li>
-    {{#logged_in}}
-      <li><span>Welcome, {{first_name}}!</span></li>
-      <li><a href="/media_queue" title="">View Queue</a></li>
-    {{/logged_in}}
-    {{^logged_in}}
-      <div class='navLogin'>
-        <li><a href="/login/" title="">Login</a></li>
-        <li><span>|</span></li>
-        <li><a href="/signup/" title="">Signup</a></li>
-      </div>
-    {{/logged_in}}
-  </ul>
-</nav>
-
+  <nav>
+    <ul>
+      {{#logged_in}}
+        <div class="left">
+          <li class="navHome"><a href="/" title="Home">Home</a></li>
+          <li><span>|</span></li>
+          <li><a class='queue' href="/media_queue" title="">View Queue</a></li>
+        </div>
+        <div class ="center">
+          <li><span class='welcome'>Welcome, {{first_name}}!</span></li>
+        </div>
+        <div class='navLogout'>
+          <li ><a href="/logout" title="">Log Out</a></li>
+        </div>
+      {{/logged_in}}
+      {{^logged_in}}
+        <div class="left">
+          <li class="navHome"><a href="/" title="Home">Home</a></li>
+        </div>
+        <div class='navLogin'>
+          <li><a href="/login" title="">Login</a></li>
+          <li><span>|</span></li>
+          <li><a href="/signup" title="">Signup</a></li>
+        </div>
+      {{/logged_in}}
+    </ul>
+  </nav>
   <header>
     <h1>Stream Search</h1>
   </header>

@@ -12,22 +12,31 @@
 <body>
   <nav>
     <ul>
-      <li class="navHome"><a href="/" title="Home">Home</a></li>
       {{#loginStatus.logged_in}}
-        <li><a href="/media_queue" title="">View Queue</a></li>
-
-      {{/loginStatus.logged_in}}
-      {{^loginStatus.logged_in}}
-        <div class='navLogin'>
-          <li><a href="/login/" title="">Login</a></li>
+        <div class="left">
+          <li class="navHome"><a href="/" title="Home">Home</a></li>
           <li><span>|</span></li>
-          <li><a href="/signup/" title="">Signup</a></li>
+          <li><a class='queue' href="/media_queue" title="">View Queue</a></li>
+        </div>
+        <div class ="center">
+          <li><form class="navform" action="/movies/" id="movieForm"><input type="text" name="movieName" id="movieName" placeholder="Movie">
+          </form></li>
+          <li><form class="navform" action="/shows/" id="showForm"><input type="text" name="showName" id="showName" placeholder="TV Show">
+        </div>
+        <div class='navLogout'>
+          <li ><a href="/logout" title="">Log Out</a></li>
         </div>
       {{/loginStatus.logged_in}}
-      <li><form class="navform" action="/movies/" id="movieForm"><input type="text" name="movieName" id="movieName" placeholder="Movie">
-      </form></li>
-      <li><form class="navform" action="/shows/" id="showForm"><input type="text" name="showName" id="showName" placeholder="TV Show">
-      </form></li>
+      {{^loginStatus.logged_in}}
+        <div class="left">
+          <li class="navHome"><a href="/" title="Home">Home</a></li>
+        </div>
+        <div class='navLogin'>
+          <li><a href="/login" title="">Login</a></li>
+          <li><span>|</span></li>
+          <li><a href="/signup" title="">Signup</a></li>
+        </div>
+      {{/loginStatus.logged_in}}
     </ul>
   </nav>
   <div class='spacer'></div>

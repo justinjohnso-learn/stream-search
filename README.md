@@ -41,7 +41,6 @@ Honestly, I'm probably going to continue working on this project, as there are s
 
 * Trailer functionality for movies is currently somewhat broken (if a movie doesn't have a trailer, the info page won't load), so I need to debug that.
 * The tv show search doesn't yet return episodes. This will eventually be a separate api call once the info page has loaded
-* Implementing update and delete functionality to the media queue
 * Cleaning up the user experience (subtle animations, a more streamlined login and signup process, nicer overall css)
 * Add a 'page loading' animation, so the user knows the app is pulling/loading from the api, and hasn't crashed
 * Change info page background to movie/show art

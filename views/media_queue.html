@@ -12,11 +12,19 @@
 <body>
   <nav>
     <ul>
-      <li class="navHome"><a href="/" title="Home">Home</a></li>
-      <li><form class="navform" action="/movies/" id="movieForm"><input type="text" name="movieName" id="movieName" placeholder="Movie">
-      </form></li>
-      <li><form class="navform" action="/shows/" id="showForm"><input type="text" name="showName" id="showName" placeholder="TV Show">
-      </form></li>
+      <div class="left">
+        <li class="navHome"><a href="/" title="Home">Home</a></li>
+        <li><span>|</span></li>
+        <li><a class='queue' href="/media_queue" title="">View Queue</a></li>
+      </div>
+      <div class ="center">
+        <li><form class="navform" action="/movies/" id="movieForm"><input type="text" name="movieName" id="movieName" placeholder="Movie">
+        </form></li>
+        <li><form class="navform" action="/shows/" id="showForm"><input type="text" name="showName" id="showName" placeholder="TV Show">
+      </div>
+      <div class='navLogout'>
+        <li ><a href="/logout" title="">Log Out</a></li>
+      </div>
     </ul>
   </nav>
   <div class='spacer'></div>

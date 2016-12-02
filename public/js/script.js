@@ -83,6 +83,7 @@ showClickListener()
 // media_queue logic
 
 var postToQueue = function(data){
+    // console.log(data)
   return $.post('/media_queue/', data, function(data){
     $('.queueButton').text('Added!')
                      .removeClass('queueButton')
@@ -91,49 +92,42 @@ var postToQueue = function(data){
 }
 
 var removeFromQueue = function(data){
-  console.log(data.queue_id)
-   $(data.movie).text('Removed!')
-                           .removeClass('removeButton')
-                           .css('backgroundColor', 'green');
- // return $.ajax({
- //          url: '/media_queue/',
- //          type: 'POST',
- //          action: '/media_queue/{{queue_id}}?_method=DELETE',
- //          data: data
- //        })
- //        .done(function(data) {
- //          $('.removeButton', this).text('Removed!')
- //                           .removeClass('removeButton')
- //                           .css('backgroundColor', 'green');
- //        });
-
+    // console.log($('.clicked'))
+  $.post('/media_queue/:queue_id', data, function(data){
+    $('.clicked').text('Removed!')
+                        .removeClass('queueButton')
+                        .css('backgroundColor', 'green');
+    setTimeout(function(){
+      window.location.assign('/media_queue/')
+    }, 500)
+  });
 }
 
 var addToQueueListener = function(){
   $('.queueButton').on('click', function(event){
-    var movie = $(this).parent().parent().parent().siblings('.movieContainer').find('.movie');
+    // event.preventDefault();
+    var movie = $(this).parent().parent().parent().parent().siblings('.movieContainer').find('.movie');
     var data = {
-      'queue_id' : movie[0].dataset.queue_id,
+      // 'queue_id' : movie[0].dataset.id,
       'title' : movie[0].dataset.movie_title,
       'media_id' : movie[0].dataset.movie_id,
       'media_type' : movie[0].dataset.media_type,
       'user_id' : this.dataset.user_id
     }
-    console.log(data)
     postToQueue(data)
   })
 }
 addToQueueListener()
 
 var removeFromQueueListener = function(){
-  $('.removeButton').on('click', function(event){
+  $('.removeButton').on('click',function(event){
+    event.preventDefault();
+    $(this).addClass('clicked')
     var movie = $(this).parent()[0];
+    var queue_id = movie.dataset.queue_id
     var data = {
-      'movie' : movie,
-      'queue_id' : movie.dataset.queue_id
+      'queue_id' : queue_id
     }
-    // console.log(movie)
-    // console.log(data)
     removeFromQueue(data)
   })
 }

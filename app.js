@@ -41,7 +41,7 @@ app.use(session({
 }))
 
 // local variables
-var GUIDEBOX_KEY = process.env.GUIDEBOX_KEY || 'rKgyKajN9szgNZEi2JlcRUj6J2YXZ6D1';
+var GUIDEBOX_KEY = process.env.GUIDEBOX_KEY
 
 // -------------------------------------------------------------------
 // set up page
@@ -97,7 +97,7 @@ app.post('/signup', function(req, res){
         res.send('Error. User could not be created.');
       })
       .then(function(){
-        res.send("User Created!")
+        res.render('login');
       })
       // .then(function(){
       //   setTimeout(function(){
@@ -146,12 +146,18 @@ app.post('/login', function(req, res){
 });
 
 // -----------------------------------------------------------------------------------------------------------------------------------------
+// logout logic
+
+app.get('/logout', function(req, res){
+  req.session.user=null;
+  res.redirect('/')
+})
+
+// -----------------------------------------------------------------------------------------------------------------------------------------
 // movie logic
 
 // -------------------------------------------------------------------
 // all movies
-
-
 app.get('/movies/:movieName', function(req, res){
   console.log(req.params.movieName)
   var logged_in, user_id, first_name;
@@ -189,7 +195,7 @@ app.get('/movies/:movieName', function(req, res){
       'id' : data.id,
       'title' : data.title,
       'release_year' : data.release_year,
-      'rating' : data.rating,
+      // 'rating' : data.rating,
       'poster' : data.poster_400x570,
       // 'overview' : data.overview,
       // 'purchase_web_sources' : data.purchase_web_sources
@@ -436,7 +442,7 @@ app.get('/media_queue', function(req, res){
     'logged_in': logged_in
   };
 
-  db.many('SELECT * FROM media_queue WHERE user_id = $1', [user_id])
+db.many('SELECT * FROM media_queue WHERE user_id = $1', [user_id])
     .then(function(queue){
       var data = {
         'loginStatus' : loginStatus,
@@ -468,6 +474,11 @@ app.post('/media_queue', function(req, res){
   res.render('media_queue', loginStatus)
 })
 
-app.delete('/media_queue', function(req, res){
-  console.log("delted!")
+app.post('/media_queue/:queue_id', function(req, res){
+  var queue_id = req.body.queue_id;
+  console.log(queue_id)
+  db.none('DELETE FROM media_queue WHERE id = $1', [queue_id])
+    .then(function(){
+      res.render('media_queue')
+    })
 })

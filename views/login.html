@@ -6,6 +6,36 @@
     <link href='https://fonts.googleapis.com/css?family=Rye' rel='stylesheet' type='text/css'>
   </head>
   <body>
+    <nav>
+      <ul>
+        {{#logged_in}}
+          <div class="left">
+            <li class="navHome"><a href="/" title="Home">Home</a></li>
+            <li><span>|</span></li>
+            <li><a class='queue' href="/media_queue" title="">View Queue</a></li>
+          </div>
+          <div class ="center">
+            <li><form class="navform" action="/movies/" id="movieForm"><input type="text" name="movieName" id="movieName" placeholder="Movie">
+            </form></li>
+            <li><form class="navform" action="/shows/" id="showForm"><input type="text" name="showName" id="showName" placeholder="TV Show">
+          </div>
+          <div class='navLogout'>
+            <li ><a href="/logout" title="">Log Out</a></li>
+          </div>
+        {{/logged_in}}
+        {{^logged_in}}
+          <div class="left">
+            <li class="navHome"><a href="/" title="Home">Home</a></li>
+          </div>
+          <div class='navLogin'>
+            <li><a href="/login" title="">Login</a></li>
+            <li><span>|</span></li>
+            <li><a href="/signup" title="">Signup</a></li>
+          </div>
+        {{/logged_in}}
+      </ul>
+    </nav>
+    <div class='spacer'></div>
     <div class="main-container">
       <div class="border-container">
         <h1>Super Secure Website</h1>
