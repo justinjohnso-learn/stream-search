@@ -5,7 +5,7 @@ const app = express();
 // init pgpromise
 const port = process.env.PORT || 8000;
 const pgp = require('pg-promise')();
-const db = pgp('postgres://Justin@localhost:5432/stream_data')
+const db = pgp(process.env.DATABASE_URL || 'postgres://Justin@localhost:5432/stream_data')
 
 // init mustache
 const mustache = require('mustache-express');
@@ -40,11 +40,15 @@ app.use(session({
   cookie: { secure: false }
 }))
 
+// local variables
+var GUIDEBOX_KEY = process.env.GUIDEBOX_API_KEY;
+
 // -------------------------------------------------------------------
 // set up page
 
 app.listen(port, function() {
   console.log("IT'S ALIVE (on port " + port + ")")
+  console.log(GUIDEBOX_KEY);
 });
 
 app.get('/', function(req, res){
@@ -166,7 +170,7 @@ app.get('/movies/:movieName', function(req, res){
   // console.log(movieName)
 
   var getMovieList= function(movieName){
-    fetchUrl('https://api-public.guidebox.com/v1.43/US/rKgyKajN9szgNZEi2JlcRUj6J2YXZ6D1/search/movie/title/' + movieName +'/fuzzy',
+    fetchUrl('https://api-public.guidebox.com/v1.43/US/' + GUIDEBOX_KEY + '/search/movie/title/' + movieName +'/fuzzy',
       function(error, meta, body){
         var fuzzyMovieList = []
         var data = JSON.parse(body.toString());
@@ -232,7 +236,7 @@ app.get('/movie_search/:movieId', function(req, res){
   // console.log(movieId)
 
   var getOneMovie = function(movieId){
-    fetchUrl('https://api-public.guidebox.com/v1.43/US/rKgyKajN9szgNZEi2JlcRUj6J2YXZ6D1/movie/' + movieId,
+    fetchUrl('https://api-public.guidebox.com/v1.43/US/' + GUIDEBOX_KEY + '/movie/' + movieId,
       function(error, meta, body){
         var data = JSON.parse(body.toString())
         parseOneMovie(data)
@@ -306,7 +310,7 @@ app.get('/shows/:showName', function(req, res){
   // console.log(showName)
 
   var getShowList= function(showName){
-    fetchUrl('https://api-public.guidebox.com/v1.43/US/rKgyKajN9szgNZEi2JlcRUj6J2YXZ6D1/search/title/' + showName +'/fuzzy',
+    fetchUrl('https://api-public.guidebox.com/v1.43/US/' + GUIDEBOX_KEY + '/search/title/' + showName +'/fuzzy',
       function(error, meta, body){
         var fuzzyShowList = []
         var data = JSON.parse(body.toString());
@@ -367,7 +371,7 @@ app.get('/show_search/:showId', function(req, res){
   // console.log(showId)
 
   var getOneShow = function(showId){
-    fetchUrl('https://api-public.guidebox.com/v1.43/US/rKgyKajN9szgNZEi2JlcRUj6J2YXZ6D1/show/' + showId,
+    fetchUrl('https://api-public.guidebox.com/v1.43/US/' + GUIDEBOX_KEY + '/show/' + showId,
       function(error, meta, body){
         var data = JSON.parse(body.toString())
         parseOneShow(data)
@@ -376,7 +380,7 @@ app.get('/show_search/:showId', function(req, res){
   }
 
   var getAllEpisodes = function(showId){
-    fetchUrl('https://api-public.guidebox.com/v1.43/US/rKgyKajN9szgNZEi2JlcRUj6J2YXZ6D1/show/' + showId + '/episodes/all/0/100/all/all/true',
+    fetchUrl('https://api-public.guidebox.com/v1.43/US/' + GUIDEBOX_KEY + '/show/' + showId + '/episodes/all/0/100/all/all/true',
       function(error, meta, body){
         var data = JSON.parse(body.toString())
         console.log(data)
