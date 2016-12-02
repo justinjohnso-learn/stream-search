@@ -90,11 +90,30 @@ var postToQueue = function(data){
   });
 }
 
+var removeFromQueue = function(data){
+  console.log(data.queue_id)
+   $(data.movie).text('Removed!')
+                           .removeClass('removeButton')
+                           .css('backgroundColor', 'green');
+ // return $.ajax({
+ //          url: '/media_queue/',
+ //          type: 'POST',
+ //          action: '/media_queue/{{queue_id}}?_method=DELETE',
+ //          data: data
+ //        })
+ //        .done(function(data) {
+ //          $('.removeButton', this).text('Removed!')
+ //                           .removeClass('removeButton')
+ //                           .css('backgroundColor', 'green');
+ //        });
+
+}
+
 var addToQueueListener = function(){
   $('.queueButton').on('click', function(event){
     var movie = $(this).parent().parent().parent().siblings('.movieContainer').find('.movie');
-    var nav = $(this).parent();
     var data = {
+      'queue_id' : movie[0].dataset.queue_id,
       'title' : movie[0].dataset.movie_title,
       'media_id' : movie[0].dataset.movie_id,
       'media_type' : movie[0].dataset.media_type,
@@ -107,17 +126,15 @@ var addToQueueListener = function(){
 addToQueueListener()
 
 var removeFromQueueListener = function(){
-  $('.queueButton').on('click', function(event){
-    var movie = $(this).parent().parent().parent().siblings('.movieContainer').find('.movie');
-    var nav = $(this).parent();
+  $('.removeButton').on('click', function(event){
+    var movie = $(this).parent()[0];
     var data = {
-      'title' : movie[0].dataset.movie_title,
-      'media_id' : movie[0].dataset.movie_id,
-      'media_type' : movie[0].dataset.media_type,
-      'user_id' : this.dataset.user_id
+      'movie' : movie,
+      'queue_id' : movie.dataset.queue_id
     }
-    console.log(data)
-    postToQueue(data)
+    // console.log(movie)
+    // console.log(data)
+    removeFromQueue(data)
   })
 }
 removeFromQueueListener()

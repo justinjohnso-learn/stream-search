@@ -41,7 +41,7 @@ app.use(session({
 }))
 
 // local variables
-var GUIDEBOX_KEY = process.env.GUIDEBOX_KEY;
+var GUIDEBOX_KEY = process.env.GUIDEBOX_KEY || 'rKgyKajN9szgNZEi2JlcRUj6J2YXZ6D1';
 
 // -------------------------------------------------------------------
 // set up page
@@ -466,4 +466,8 @@ app.post('/media_queue', function(req, res){
   };
   // console.log(loginStatus)
   res.render('media_queue', loginStatus)
+})
+
+app.delete('/media_queue', function(req, res){
+  console.log("delted!")
 })
