@@ -29,11 +29,10 @@
   </nav>
   <div class='spacer'></div>
   <h1>Media Queue</h1>
-    Test
   <div class="queue">
     {{#queue}}
       <div data-queue_id='{{id}}'>
-        <span>Title: {{title}}</span><br/>
+        <span><a href="" title="">Title: {{title}}</a></span><br/>
         <span>Type: {{media_type}}</span><br/>
         <button class="button removeButton">Remove From Queue</button>
       </div>
